@@ -6,9 +6,11 @@ const constants = {
 	FACE_LEFT: 'left',
 	FACE_RIGHT: 'right',
 	FONT_FAMILY: 'Syne Mono',
-	GRAVITY: 80,
+	GRAVITY: 100,
 	LABEL_FLOAT_VELOCITY: 40,
 	LABEL_SIZE: 20,
+	OAUTH_REDIRECT_URI: '',
+	OAUTH_URL: '',
 	SCREEN_HEIGHT: 1080,
 	SCREEN_WIDTH: 1920,
 	STROKE_COLOR: '#000',
@@ -18,9 +20,12 @@ const constants = {
 	WALK_MIN_VELOCITY: 20,
 };
 
+constants.OAUTH_REDIRECT_URI = encodeURIComponent(
+	window.location.href.replace(/[^/]\.html|$/i, 'oauth.html'));
+
 constants.OAUTH_URL = `https://id.twitch.tv/oauth2/authorize`
 	+ `?client_id=${constants.CLIENT_ID}`
-	+ `&redirect_uri=${encodeURIComponent(window.location.href.replace(/[^/]\.html|$/i, 'oauth.html'))}`
+	+ `&redirect_uri=${constants.OAUTH_REDIRECT_URI}`
 	+ `&response_type=token`
 	+ `&scope=chat:read%20chat:edit`;
 
