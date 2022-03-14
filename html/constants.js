@@ -6,7 +6,7 @@ const constants = {
 	FACE_LEFT: 'left',
 	FACE_RIGHT: 'right',
 	FONT_FAMILY: 'Syne Mono',
-	GRAVITY: 100,
+	GRAVITY: 0,
 	LABEL_FLOAT_VELOCITY: 40,
 	LABEL_SIZE: 20,
 	OAUTH_REDIRECT_URI: '',
