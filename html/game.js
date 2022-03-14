@@ -2,8 +2,10 @@ import constants from './constants.js';
 import emitter from './emitter.js';
 import WebFontFile from './webfontfile.js';
 
+/** avatar definitions and metadata */
 const avatarDefs = {};
 
+// load and parse avatar definitions
 await (async () => {
 	await fetch('./config.json').then(r => r.json()).then(async d => {
 
@@ -93,6 +95,7 @@ class Game extends Phaser.Scene {
 
 	// events
 
+	/** when two labels collide with one another */
 	onLabelOverlap(a, b) {
 		a.overlapping = (a.container.x < b.container.x || a.y < b.y);
 		/**
@@ -103,6 +106,7 @@ class Game extends Phaser.Scene {
 		b.overlapping = !a.overlapping;
 	}
 
+	/** new avatar event */
 	onNew(username, key = 'mario') {
 		if (this.avatars.hasOwnProperty(username))
 			return;

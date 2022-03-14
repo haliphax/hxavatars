@@ -3,6 +3,7 @@ import { createMachine, interpret }
 import constants from './constants.js';
 import { uuid } from './util.js';
 
+/** on-screen avatar with state machine */
 class Avatar {
 	constructor(game, avatarDefs, username, key = 'mario') {
 		/** @type {string} The avatar owner's username */
@@ -140,6 +141,7 @@ class Avatar {
 		this.ready();
 	}
 
+	/** called from constructor to await physics */
 	ready() {
 		if (!this.container.body)
 			return setTimeout(this.ready.bind(this), 100);
@@ -155,6 +157,7 @@ class Avatar {
 			constants.SCREEN_HEIGHT);
 	}
 
+	/** update the avatar per animation frame */
 	update() {
 		if (!this.container.body)
 			return;
@@ -194,6 +197,7 @@ class Avatar {
 
 	// extensions
 
+	/** flip the sprite's facing */
 	changeFace() {
 		this.face = this.face == constants.FACE_LEFT
 			? constants.FACE_RIGHT
