@@ -102,13 +102,7 @@ class Game extends Phaser.Scene {
 
 	/** when two labels collide with one another */
 	onLabelOverlap(a, b) {
-		a.overlapping = (a.container.x < b.container.x || a.y < b.y);
-		/**
-		 * TODO: This prevents them from floating forever, but results in some
-		 * unresolved overlaps. Would be better to check and see if there is
-		 * empty space below the label first.
-		 */
-		b.overlapping = !a.overlapping;
+		a.overlapping = (a.body.touching.down && (a.body.touching.left || a.body.touching.right))
 	}
 
 	/** new avatar event */

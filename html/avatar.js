@@ -162,20 +162,18 @@ class Avatar {
 		if (!this.container.body)
 			return;
 
-		// "float" labels to avoid overlaps (needs work; they "bounce" a lot)
-
-		if (this.label.overlapping || this.label.y > this.labelYPosition)
+		if (this.label.overlapping)
 			this.label.body.velocity.y = -constants.LABEL_FLOAT_VELOCITY;
 		else if (this.label.y < this.labelYPosition)
 			this.label.body.velocity.y = constants.LABEL_FLOAT_VELOCITY;
-
-		const diff = this.labelYPosition - this.label.y;
-
-		if ((this.label.body.velocity.y > 0 && diff < 1)
-			|| (this.label.body.velocity.y < 0 && diff < -1))
-		{
+		else
 			this.label.body.velocity.y = 0;
-			this.label.y = this.labelYPosition;
+
+		if (!this.label.overlapping) {
+			const diff = Math.abs(this.labelYPosition - this.label.y);
+
+			if (diff < 1)
+				this.label.y = this.labelYPosition;
 		}
 
 		this.label.overlapping = false;

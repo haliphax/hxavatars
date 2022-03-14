@@ -7,7 +7,7 @@ const constants = {
 	FACE_RIGHT: 'right',
 	FONT_FAMILY: 'Syne Mono',
 	GRAVITY: 0,
-	LABEL_FLOAT_VELOCITY: 40,
+	LABEL_FLOAT_VELOCITY: 100,
 	LABEL_SIZE: 20,
 	OAUTH_REDIRECT_URI: '',
 	OAUTH_URL: '',
