@@ -1,0 +1,5 @@
+http:
+  middlewares:
+    secureHeaders:
+      headers:
+        sslRedirect: true

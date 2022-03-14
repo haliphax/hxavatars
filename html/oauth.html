@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Avatar system authorization | haliphax.dev</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" href="favicon.gif" />
+		<script type="module" src="oauth.js"></script>
+	</head>
+	<body>
+		<h1>Overlay URL builder</h1>
+		<p>
+			Use this form to construct your overlay URL. <code>Channel</code> should
+			be your Twitch username, and <code>Bot username</code> should be
+			the username of the account your token is authorized for. (Most likely,
+			that's <em>your</em> username unless you have a separate bot account.)
+		</p>
+		<p>
+			After submitting the form, you will be taken to the live overlay. Copy
+			the URL from your browser for use in your streaming software (e.g. OBS).
+		</p>
+		<form action="./">
+			<fieldset>
+				<legend>Overlay variables</legend>
+				<input type="hidden" name="oauth" />
+				<p>
+					<label for="channel">Channel:</label>
+					<input type="text" id="channel" name="channel" placeholder="haliphax" required />
+				</p>
+				<p>
+					<label for="username">Bot username:</label>
+					<input type="text" id="username" name="username" placeholder="phaxb0t" required />
+				</p>
+				<p>
+					<button type="submit">Go!</button>
+				</p>
+			</fieldset>
+		</form>
+	</body>
+</html>

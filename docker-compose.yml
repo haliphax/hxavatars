@@ -1,0 +1,35 @@
+version: '3'
+services:
+  nginx:
+    expose:
+      - 80
+    image: nginx
+    networks:
+      - proxy
+      - internal
+    restart: unless-stopped
+    volumes:
+      - ./static:/usr/share/nginx/html:ro
+    labels:
+      - traefik.docker.network=proxy
+      - traefik.enable=true
+      - traefik.http.routers.avatars.entrypoints=websecure
+      - traefik.http.routers.avatars.rule=Host(`avatars.localdomain`)
+      - traefik.http.routers.avatars.tls=true
+  traefik:
+    image: traefik:2.6.1
+    networks:
+      - proxy
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+    volumes:
+      - ./traefik.yml:/traefik.yml:ro
+      - ./dynamic.yml:/configurations/dynamic.yml:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+networks:
+  internal:
+  proxy:

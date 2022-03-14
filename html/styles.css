@@ -1,0 +1,14 @@
+html, body {
+	background-color: rgba(0, 0, 0, 0);
+	height: 100%;
+	margin: 0;
+	min-height: 100%;
+	overflow: hidden;
+	padding: 0;
+	width: 100%;
+}
+
+* {
+	image-rendering: pixelated !important;
+	image-rendering: crisp-edges !important;
+}
