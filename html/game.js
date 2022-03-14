@@ -29,7 +29,7 @@ class Game extends Phaser.Scene {
 		super();
 
 		this.avatars = {};
-		this.labelGroup = this.labelCollider = null;
+		this.labelGroup = this.labelCollider = this.spriteGroup = null;
 
 		// event handlers
 		emitter.on('new', this.onNew.bind(this));
@@ -80,6 +80,11 @@ class Game extends Phaser.Scene {
 	}
 
 	create() {
+		this.spriteGroup = this.physics.add.group({
+			bounceX: 1,
+			bounceY: 1,
+			collideWorldBounds: true,
+		});
 		this.labelGroup = this.physics.add.group();
 		this.labelCollider = this.physics.add.collider(
 			this.labelGroup, this.labelGroup, this.onLabelOverlap.bind(this));
@@ -113,6 +118,7 @@ class Game extends Phaser.Scene {
 
 		this.avatars[username] =
 			new avatarDefs[key].class(this, avatarDefs, username, key);
+		this.spriteGroup.add(this.avatars[username].sprite);
 		this.labelGroup.add(this.avatars[username].label);
 	}
 }
