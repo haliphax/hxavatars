@@ -80,17 +80,18 @@ class Game extends Phaser.Scene {
 	}
 
 	create() {
+		this.physics.world
+			.setBounds(0, 0, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)
+			.setBoundsCollision(true, true, false, true);
+
 		this.spriteGroup = this.physics.add.group({
 			bounceX: 1,
 			bounceY: 1,
 			collideWorldBounds: true,
 		});
+
 		this.labelGroup = this.physics.add.group();
-		this.labelCollider = this.physics.add.collider(
-			this.labelGroup, this.labelGroup, this.onLabelOverlap.bind(this));
-		this.physics.world
-			.setBounds(0, 0, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)
-			.setBoundsCollision(true, true, false, true);
+		this.labelCollider = this.physics.add.overlap(this.labelGroup, this.labelGroup, this.onCollide.bind(this));
 	}
 
 	update(time, delta) {
@@ -100,9 +101,8 @@ class Game extends Phaser.Scene {
 
 	// events
 
-	/** when two labels collide with one another */
-	onLabelOverlap(a, b) {
-		a.overlapping = (a.body.touching.down && (a.body.touching.left || a.body.touching.right))
+	onCollide(a, b) {
+		console.log(a.body.touching);
 	}
 
 	/** new avatar event */
