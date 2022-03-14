@@ -9,7 +9,7 @@ services:
       - internal
     restart: unless-stopped
     volumes:
-      - ./static:/usr/share/nginx/html:ro
+      - ./html:/usr/share/nginx/html:ro
     labels:
       - traefik.docker.network=proxy
       - traefik.enable=true
@@ -26,7 +26,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./traefik.yml:/traefik.yml:ro
-      - ./dynamic.yml:/configurations/dynamic.yml:ro
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
 

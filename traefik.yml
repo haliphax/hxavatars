@@ -13,15 +13,9 @@ entryPoints:
 
   websecure:
     address: :443
-    http:
-      middlewares:
-        - secureHeaders@file
 
 providers:
   docker:
     exposedByDefault: false
     network: proxy
     watch: true
-
-  file:
-    filename: /configurations/dynamic.yml
