@@ -129,7 +129,8 @@ class MainScene extends Phaser.Scene {
 
 		if (this.avatars.hasOwnProperty(username)) {
 			const oldAvatar = this.avatars[username];
-			const x = oldAvatar.container.x;
+			const containerX = oldAvatar.container.x;
+			const labelY = oldAvatar.label.y;
 
 			this.spriteGroup.remove(oldAvatar.sprite);
 			this.labelGroup.remove(oldAvatar.label);
@@ -137,7 +138,10 @@ class MainScene extends Phaser.Scene {
 			delete this.avatars[username];
 			this.onNew(username, key);
 
-			this.avatars[username].container.x = x;
+			const newAvatar = this.avatars[username];
+
+			newAvatar.container.x = containerX;
+			newAvatar.label.y = labelY;
 		}
 		else
 			this.onNew(username, key);
