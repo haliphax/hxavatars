@@ -5,7 +5,9 @@ import { uuid } from './util.js';
 
 /** on-screen avatar with state machine */
 class Avatar {
-	constructor(game, avatarDefs, username, key = 'mario') {
+	constructor(scene, avatarDefs, username, key = 'mario') {
+		/** @type {Phaser.Scene} The current scene */
+		this.scene = scene;
 		/** @type {string} The avatar owner's username */
 		this.username = username;
 		/** @type {string} The avatar's sprite name */
@@ -15,7 +17,7 @@ class Avatar {
 			? constants.FACE_LEFT
 			: constants.FACE_RIGHT;
 		/** @type {Phaser.GameObjects.Sprite} The avatar's sprite */
-		this.sprite = game.physics.add.sprite(0, 0, key)
+		this.sprite = this.scene.physics.add.sprite(0, 0, key)
 			.setOrigin(0.5, 1)
 			.setScale(avatarDefs[key].metadata.scale);
 		/**
@@ -27,7 +29,7 @@ class Avatar {
 			-this.sprite.displayHeight - (constants.LABEL_SIZE / 2);
 		/** @type {Phase.GameObjects.Label} The username label for the avatar */
 		this.label =
-			game.add.text(
+			this.scene.add.text(
 				0, this.labelYPosition, username,
 				{
 					fontFamily: `"${constants.FONT_FAMILY}"`,
@@ -37,7 +39,7 @@ class Avatar {
 				})
 			.setOrigin(0.5, 1);
 		/** The avatar's container, allowing us to manipulate a single object */
-		this.container = game.add.container();
+		this.container = this.scene.add.container();
 		/** The name of the next state to transition to */
 		this.nextState = null;
 		/** The state machine's currently active state */
@@ -88,7 +90,7 @@ class Avatar {
 					},
 					idle: (context, event) => {
 						//console.debug('idling');
-						this.container.body.velocity.x = 0;
+						this.container.body.setVelocityX(0);
 						this.sprite.play(`${this.key}.idle.${this.face}`);
 						setTimeout(
 							this.stateService.send.bind(this, 'DECIDE'),
@@ -106,12 +108,12 @@ class Avatar {
 							this.changeFace();
 
 						if (swap || event.prev != 'walking') {
-							this.container.body.velocity.x =
+							this.container.body.setVelocityX(
 								(constants.WALK_MIN_VELOCITY
 									+ Math.random()
 									* (constants.WALK_MAX_VELOCITY
 										- constants.WALK_MIN_VELOCITY))
-								* (this.face == constants.FACE_LEFT ? -1 : 1);
+								* (this.face == constants.FACE_LEFT ? -1 : 1));
 							this.sprite.play(`${this.key}.walking.${this.face}`);
 						}
 
@@ -129,9 +131,9 @@ class Avatar {
 		this.label.avatar = this;
 		this.label.container = this.container;
 		this.label.overlapping = false;
-		game.physics.world.enableBody(this.label);
+		this.scene.physics.world.enableBody(this.label);
 		this.container.avatar = this;
-		game.physics.world.enableBody(this.container);
+		this.scene.physics.world.enableBody(this.container);
 		this.stateService.onTransition(state => {
 			this.previousState = this.currentState.name;
 			this.currentState = state;
@@ -143,7 +145,7 @@ class Avatar {
 
 	/** called from constructor to await physics */
 	ready() {
-		if (!this.container.body)
+		if (!this.container.body || !this.label.body)
 			return setTimeout(this.ready.bind(this), 100);
 
 		this.container.body.setSize(
@@ -159,24 +161,38 @@ class Avatar {
 
 	/** update the avatar per animation frame */
 	update() {
-		if (!this.container.body)
+		if (!this.container.body || !this.label.body)
 			return;
 
-		if (this.label.overlapping)
-			this.label.body.velocity.y = -constants.LABEL_FLOAT_VELOCITY;
-		else if (this.label.y < this.labelYPosition)
-			this.label.body.velocity.y = constants.LABEL_FLOAT_VELOCITY;
+		// raise/lower labels to avoid overlap
+
+		const notThisLabel = this.scene.labelGroup.children.entries
+			.filter(l => l != this);
+
+		const shouldRise = notThisLabel.some(l =>
+			l.body.left <= this.label.body.right
+			&& l.body.right >= this.label.body.left
+			&& l.body.top < this.label.body.bottom + 8
+			&& (l.body.bottom > this.label.body.bottom
+				|| (l.body.bottom == this.label.body.bottom && l.body.x < this.label.body.x)));
+
+		const shouldFall = !shouldRise
+			&& this.label.y < this.labelYPosition
+			&& !notThisLabel.some(l =>
+				l.body.left <= this.label.body.right
+				&& l.body.right >= this.label.body.left
+				&& l.body.top < this.label.body.bottom + 12
+				&& l.body.bottom > this.label.body.bottom);
+
+		if (shouldRise)
+			this.label.body.setVelocityY(-constants.LABEL_FLOAT_VELOCITY);
+		else if (shouldFall)
+			this.label.body.setVelocityY(constants.LABEL_FLOAT_VELOCITY);
 		else
-			this.label.body.velocity.y = 0;
+			this.label.body.setVelocityY(0);
 
-		if (!this.label.overlapping) {
-			const diff = Math.abs(this.labelYPosition - this.label.y);
-
-			if (diff < 1)
-				this.label.y = this.labelYPosition;
-		}
-
-		this.label.overlapping = false;
+		if (this.label.y > this.labelYPosition)
+			this.label.setPosition(this.label.x, this.labelYPosition);
 
 		// turn around if avatar hits the edge of the screen
 		if (this.currentState.value == 'walking'
@@ -189,7 +205,7 @@ class Avatar {
 		{
 			this.changeFace();
 			this.sprite.play(`${this.key}.walking.${this.face}`);
-			this.container.body.velocity.x *= -1;
+			this.container.body.setVelocityX(-this.container.body.velocity.x);
 		}
 	}
 

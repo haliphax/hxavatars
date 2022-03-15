@@ -1,18 +1,18 @@
-import constants from './constants.js';
-import emitter from './emitter.js';
-import WebFontFile from './webfontfile.js';
+import constants from '../constants.js';
+import emitter from '../emitter.js';
+import WebFontFile from '../webfontfile.js';
 
 /** avatar definitions and metadata */
 const avatarDefs = {};
 
 // load and parse avatar definitions
 await (async () => {
-	await fetch('./config.json').then(r => r.json()).then(async d => {
+	await fetch('../config.json').then(r => r.json()).then(async d => {
 
 		for (let avatar of d.avatars) {
 			//console.debug(`importing ${avatar}`);
 
-			await import(`./avatars/${avatar}/avatar.js`).then(m => {
+			await import(`../avatars/${avatar}/avatar.js`).then(m => {
 				//console.debug(`defining ${avatar}`);
 				avatarDefs[avatar] = {
 					metadata: m.metadata,
@@ -41,7 +41,7 @@ class Game extends Phaser.Scene {
 		for (let avatar of Object.keys(avatarDefs)) {
 			const def = avatarDefs[avatar];
 
-			this.load.spritesheet(avatar, `./avatars/${avatar}/avatar.gif`, {
+			this.load.spritesheet(avatar, `../avatars/${avatar}/avatar.gif`, {
 				frameHeight: def.metadata.frameHeight,
 				frameWidth: def.metadata.frameWidth,
 			});
@@ -86,8 +86,6 @@ class Game extends Phaser.Scene {
 			collideWorldBounds: true,
 		});
 		this.labelGroup = this.physics.add.group();
-		this.labelCollider = this.physics.add.collider(
-			this.labelGroup, this.labelGroup, this.onLabelOverlap.bind(this));
 		this.physics.world
 			.setBounds(0, 0, constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)
 			.setBoundsCollision(true, true, false, true);
@@ -102,7 +100,13 @@ class Game extends Phaser.Scene {
 
 	/** when two labels collide with one another */
 	onLabelOverlap(a, b) {
-		a.overlapping = (a.body.touching.down && (a.body.touching.left || a.body.touching.right))
+		// TODO: This whole thing is fucked
+		a.overlapping = a.body.left < b.body.left || a.body.bottom < b.body.bottom;
+		b.overlapping = !a.overlapping;
+
+		for (let x of [a, b])
+			if (!x.overlapping)
+				x.body.setVelocityY(0);
 	}
 
 	/** new avatar event */
