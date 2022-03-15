@@ -4,6 +4,7 @@ import WebFontFile from '../webfontfile.js';
 
 /** avatar definitions and metadata */
 const avatarDefs = {};
+const avatarKeys = [];
 
 // load and parse avatar definitions
 await (async () => {
@@ -37,9 +38,10 @@ class MainScene extends Phaser.Scene {
 	}
 
 	preload() {
+		Object.keys(avatarDefs).map(k => avatarKeys.push(k));
 		this.load.addFile(new WebFontFile(this.load, constants.FONT_FAMILY));
 
-		for (let avatar of Object.keys(avatarDefs)) {
+		for (let avatar of avatarKeys) {
 			const def = avatarDefs[avatar];
 
 			// load is relative to document
@@ -55,7 +57,7 @@ class MainScene extends Phaser.Scene {
 	ready() {
 		console.log('ready');
 
-		for (let avatar of Object.keys(avatarDefs)) {
+		for (let avatar of avatarKeys) {
 			//console.debug(`initializing ${avatar}`);
 
 			const def = avatarDefs[avatar];
@@ -105,11 +107,8 @@ class MainScene extends Phaser.Scene {
 		if (this.avatars.hasOwnProperty(username))
 			return;
 
-		if (key === null) {
-			const avatarKeys = Object.keys(avatarDefs);
-
+		if (key === null)
 			key = avatarKeys[Math.floor(Math.random() * avatarKeys.length)];
-		}
 		else if (!avatarDefs.hasOwnProperty(key))
 			return;
 
