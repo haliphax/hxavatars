@@ -172,16 +172,17 @@ class Avatar {
 		const shouldRise = notThisLabel.some(l =>
 			l.body.left <= this.label.body.right
 			&& l.body.right >= this.label.body.left
-			&& l.body.top < this.label.body.bottom + 8
+			&& l.body.top < this.label.body.bottom + constants.LABEL_RISE_MARGIN
 			&& (l.body.bottom > this.label.body.bottom
-				|| (l.body.bottom == this.label.body.bottom && l.body.x < this.label.body.x)));
+				|| (l.body.bottom == this.label.body.bottom
+					&& l.body.x < this.label.body.x)));
 
 		const shouldFall = !shouldRise
 			&& this.label.y < this.labelYPosition
 			&& !notThisLabel.some(l =>
 				l.body.left <= this.label.body.right
 				&& l.body.right >= this.label.body.left
-				&& l.body.top < this.label.body.bottom + 12
+				&& l.body.top < this.label.body.bottom + constants.LABEL_FALL_MARGIN
 				&& l.body.bottom > this.label.body.bottom);
 
 		if (shouldRise)
