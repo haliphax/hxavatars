@@ -43,7 +43,7 @@ class MainScene extends Phaser.Scene {
 			const def = avatarDefs[avatar];
 
 			// load is relative to document
-			this.load.spritesheet(avatar, `./avatars/${avatar}/avatar.gif`, {
+			this.load.spritesheet(avatar, `./avatars/${avatar}/avatar.png`, {
 				frameHeight: def.metadata.frameHeight,
 				frameWidth: def.metadata.frameWidth,
 			});
@@ -101,8 +101,16 @@ class MainScene extends Phaser.Scene {
 	// events
 
 	/** new avatar event */
-	onNew(username, key = 'mario') {
+	onNew(username, key = null) {
 		if (this.avatars.hasOwnProperty(username))
+			return;
+
+		if (key === null) {
+			const avatarKeys = Object.keys(avatarDefs);
+
+			key = avatarKeys[Math.floor(Math.random() * avatarKeys.length)];
+		}
+		else if (!avatarDefs.hasOwnProperty(key))
 			return;
 
 		this.avatars[username] =
