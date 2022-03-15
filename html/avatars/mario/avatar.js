@@ -13,6 +13,7 @@ const metadata = {
 			frameRate: 6,
 		},
 	},
+	extruded: true,
 	frameHeight: 32,
 	frameWidth: 18,
 	scale: 3,

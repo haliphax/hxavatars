@@ -44,11 +44,16 @@ class MainScene extends Phaser.Scene {
 
 		for (let avatar of avatarKeys) {
 			const def = avatarDefs[avatar];
+			const extras = (def.metadata.hasOwnProperty('extruded')
+				&& def.metadata.extruded)
+					? { margin: 1, spacing: 2 }
+					: { /* empty */ };
 
 			// load is relative to document
 			this.load.spritesheet(avatar, `./avatars/${avatar}/avatar.png`, {
 				frameHeight: def.metadata.frameHeight,
 				frameWidth: def.metadata.frameWidth,
+				...extras,
 			});
 		}
 
