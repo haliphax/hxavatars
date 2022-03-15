@@ -16,6 +16,6 @@ entryPoints:
 
 providers:
   docker:
-    exposedByDefault: false
+    exposedByDefault: true
     network: proxy
     watch: true

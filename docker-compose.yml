@@ -3,7 +3,7 @@ services:
   nginx:
     expose:
       - 80
-    image: nginx
+    image: nginx:latest
     networks:
       - proxy
       - internal
@@ -15,7 +15,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.avatars.entrypoints=websecure
       - traefik.http.routers.avatars.rule=Host(`avatars.localdomain`)
+      - traefik.http.routers.avatars.service=avatars
       - traefik.http.routers.avatars.tls=true
+      - traefik.http.services.avatars.loadbalancer.server.port=80
   traefik:
     image: traefik:2.6.1
     networks:
