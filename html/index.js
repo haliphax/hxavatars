@@ -35,6 +35,9 @@ const avatars = {};
 const commandRgx = /^(\![-_.a-z0-9]+)(?:\s+(.+))?$/i;
 
 twitch.on('message', (channel, tags, message, self) => {
+	if (self)
+		return;
+
 	// add avatar for chatter if they don't have one
 	if (!avatars.hasOwnProperty(tags['display-name'])) {
 		avatars[tags['display-name']] = true;
@@ -44,17 +47,23 @@ twitch.on('message', (channel, tags, message, self) => {
 
 	const cmd = commandRgx.exec(message);
 
-	if (self || !cmd) return;
+	if (!cmd) return;
 
 	/** command being executed */
 	const command = cmd[1].toLowerCase().substring(1);
 	/** string of command arguments (if any) */
 	const args = cmd[2];
 
+	console.log(`Command: ${command}`);
+	console.log(`Args: ${args}`);
+
 	// TODO: command timeouts
 
 	switch (command) {
-		// TODO: commands
+		case 'avatar':
+			console.log('Changing');
+			emitter.emit('change', tags['display-name'], args);
+			break;
 	}
 });
 

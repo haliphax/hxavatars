@@ -34,6 +34,7 @@ class MainScene extends Phaser.Scene {
 		this.labelGroup = this.labelCollider = this.spriteGroup = null;
 
 		// event handlers
+		emitter.on('change', this.onChange.bind(this));
 		emitter.on('new', this.onNew.bind(this));
 	}
 
@@ -109,13 +110,37 @@ class MainScene extends Phaser.Scene {
 
 		if (key === null)
 			key = avatarKeys[Math.floor(Math.random() * avatarKeys.length)];
-		else if (!avatarDefs.hasOwnProperty(key))
+		else if (!avatarKeys.includes(key))
 			return;
 
 		this.avatars[username] =
 			new avatarDefs[key].class(this, avatarDefs, username, key);
 		this.spriteGroup.add(this.avatars[username].sprite);
 		this.labelGroup.add(this.avatars[username].label);
+	}
+
+	/** change avatar event */
+	onChange(username, key) {
+		if (!avatarKeys.includes(key)) {
+			console.log(avatarKeys);
+			console.log(`No such key: ${key}`);
+			return;
+		}
+
+		if (this.avatars.hasOwnProperty(username)) {
+			const oldAvatar = this.avatars[username];
+			const x = oldAvatar.container.x;
+
+			this.spriteGroup.remove(oldAvatar.sprite);
+			this.labelGroup.remove(oldAvatar.label);
+			oldAvatar.destroy();
+			delete this.avatars[username];
+			this.onNew(username, key);
+
+			this.avatars[username].container.x = x;
+		}
+		else
+			this.onNew(username, key);
 	}
 }
 

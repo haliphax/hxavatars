@@ -5,7 +5,7 @@ import { uuid } from './util.js';
 
 /** on-screen avatar with state machine */
 class Avatar {
-	constructor(scene, avatarDefs, username, key = 'mario') {
+	constructor(scene, avatarDefs, username, key, x) {
 		/** @type {Phaser.Scene} The current scene */
 		this.scene = scene;
 		/** @type {string} The avatar owner's username */
@@ -17,7 +17,7 @@ class Avatar {
 			? constants.FACE_LEFT
 			: constants.FACE_RIGHT;
 		/** @type {Phaser.GameObjects.Sprite} The avatar's sprite */
-		this.sprite = this.scene.physics.add.sprite(0, 0, key)
+		this.sprite = this.scene.physics.add.sprite(x, 0, key)
 			.setOrigin(0.5, 1)
 			.setScale(avatarDefs[key].metadata.scale);
 		/**
@@ -143,6 +143,13 @@ class Avatar {
 		this.ready();
 	}
 
+	/** clean up avatar */
+	destroy() {
+		this.sprite.destroy();
+		this.label.destroy();
+		this.stateService.stop();
+	}
+
 	/** called from constructor to await physics */
 	ready() {
 		if (!this.container.body || !this.label.body)
@@ -161,7 +168,7 @@ class Avatar {
 
 	/** update the avatar per animation frame */
 	update() {
-		if (!this.container.body || !this.label.body)
+		if (!this.container.body || !this.label.body || !this.sprite)
 			return;
 
 		// raise/lower labels to avoid overlap
