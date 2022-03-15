@@ -7,11 +7,12 @@ const avatarDefs = {};
 
 // load and parse avatar definitions
 await (async () => {
-	await fetch('../config.json').then(r => r.json()).then(async d => {
-
+	// fetch is relative to document
+	await fetch('./config.json').then(r => r.json()).then(async d => {
 		for (let avatar of d.avatars) {
 			//console.debug(`importing ${avatar}`);
 
+			// import is relative to script
 			await import(`../avatars/${avatar}/avatar.js`).then(m => {
 				//console.debug(`defining ${avatar}`);
 				avatarDefs[avatar] = {
@@ -24,7 +25,7 @@ await (async () => {
 })();
 
 /** main game scene */
-class Game extends Phaser.Scene {
+class MainScene extends Phaser.Scene {
 	constructor() {
 		super();
 
@@ -41,7 +42,8 @@ class Game extends Phaser.Scene {
 		for (let avatar of Object.keys(avatarDefs)) {
 			const def = avatarDefs[avatar];
 
-			this.load.spritesheet(avatar, `../avatars/${avatar}/avatar.gif`, {
+			// load is relative to document
+			this.load.spritesheet(avatar, `./avatars/${avatar}/avatar.gif`, {
 				frameHeight: def.metadata.frameHeight,
 				frameWidth: def.metadata.frameWidth,
 			});
@@ -98,17 +100,6 @@ class Game extends Phaser.Scene {
 
 	// events
 
-	/** when two labels collide with one another */
-	onLabelOverlap(a, b) {
-		// TODO: This whole thing is fucked
-		a.overlapping = a.body.left < b.body.left || a.body.bottom < b.body.bottom;
-		b.overlapping = !a.overlapping;
-
-		for (let x of [a, b])
-			if (!x.overlapping)
-				x.body.setVelocityY(0);
-	}
-
 	/** new avatar event */
 	onNew(username, key = 'mario') {
 		if (this.avatars.hasOwnProperty(username))
@@ -121,4 +112,4 @@ class Game extends Phaser.Scene {
 	}
 }
 
-export default Game;
+export default MainScene;

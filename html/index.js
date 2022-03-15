@@ -1,6 +1,6 @@
 import constants from './constants.js';
 import emitter from './emitter.js';
-import mainScene from './scenes/main.js';
+import MainScene from './scenes/main.js';
 import { qs } from './querystring.js';
 import { twitch } from './twitch.js';
 
@@ -23,7 +23,7 @@ const game = new Phaser.Game({
 	render: {
 		transparent: (qs.hasOwnProperty('demo') ? false : true),
 	},
-	scene: [mainScene],
+	scene: [MainScene],
 	type: Phaser.AUTO,
 	width: constants.SCREEN_WIDTH,
 });
