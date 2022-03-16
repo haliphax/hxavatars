@@ -1,0 +1,6 @@
+version: '3'
+
+services:
+  traefik:
+    labels:
+      - traefik.http.routers.avatars.rule=Host(`avatars.localdomain`)
