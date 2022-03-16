@@ -1,0 +1,7 @@
+{
+  "project": {
+    "name": "hxAvatars",
+    "description": "A front-end-only viewer avatars system for Twitch chat",
+    "version": "1.0.0-alpha1"
+  }
+}
