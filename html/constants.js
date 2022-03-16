@@ -23,7 +23,7 @@ const constants = {
 };
 
 constants.OAUTH_REDIRECT_URI = encodeURIComponent(
-	window.location.href.replace(/[^/]\.html|$/i, 'oauth.html'));
+	window.location.href.replace(/(?:overlay\/?)?(?:[^/]\.html|$)/i, 'oauth'));
 
 constants.OAUTH_URL = `https://id.twitch.tv/oauth2/authorize`
 	+ `?client_id=${constants.CLIENT_ID}`

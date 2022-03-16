@@ -1,4 +1,4 @@
-import constants from '../constants.js';
+import constants from '../../constants.js';
 import emitter from '../emitter.js';
 import WebFontFile from '../webfontfile.js';
 

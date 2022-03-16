@@ -1,3 +1,7 @@
+/** parsed hash string (key-value pairs become object properties) */
+const hs = Object.fromEntries(
+	window.location.hash.substring(1)?.split('&').map(v => v.split('=')) ?? []);
+
 /**
  * Generates a UUID.
  *
@@ -9,4 +13,7 @@ const uuid = () =>
 			? (crypto.getRandomValues(new Uint8Array(1))[0] & 15).toString(16)
 			: (crypto.getRandomValues(new Uint8Array(1))[0] & 5).toString()));
 
-export { uuid };
+export {
+	hs,
+	uuid,
+};

@@ -1,12 +1,11 @@
-import { qs } from './querystring.js';
+import { hs } from '../util.js';
 
 /** Twitch client */
 const twitch = new tmi.Client({
-	options: { debug: true },
-	channels: [qs.channel],
+	channels: [hs.channel],
 	identity: {
-		username: qs.username,
-		password: `oauth:${qs.oauth}`,
+		username: hs.username,
+		password: `oauth:${hs.oauth}`,
 	},
 });
 

@@ -1,4 +1,4 @@
-import Avatar from '../../avatar.js';
+import Avatar from '../avatar.js';
 
 const metadata = {
 	animations: {

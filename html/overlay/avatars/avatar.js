@@ -1,7 +1,7 @@
 import { createMachine, interpret }
 	from 'https://unpkg.com/xstate@4/dist/xstate.web.js';
-import constants from './constants.js';
-import { uuid } from './util.js';
+import constants from '../../constants.js';
+import { uuid } from '../../util.js';
 
 /** on-screen avatar with state machine */
 class Avatar {
