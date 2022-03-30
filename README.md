@@ -39,17 +39,18 @@ docker-compose up
 If you are running the system with docker on WSL, it is likely that you will
 not be able to use `localhost` as the hostname for the web application. In this
 case, add a [hosts file] mapping for `avatars.localdomain` to the WSL system's
-address. (Use `ip addr` and check the output for `eth0` in most cases.) When
-invoking docker-compose, include the `wsl.yml` additional configuration to
-override the hostname Traefik will use for the nginx service:
+address. (Use `ip addr` and check the output for `eth0` in most cases.) Copy
+the `wsl.yml` file to a new `docker-compose.override.yml` file. This file will
+be automatically merged with the base configuration at runtime.
 
 ```shell
-docker-compose -f docker-compose.yml -f wsl.yml up
+cp wsl.yml docker-compose.override.yml
+docker-compose up
 ```
 
-You may craft a similar file with a different hostname if you just want to use
-something other than `localhost`, of course; you don't have to be using WSL to
-take advantage of this.
+You may craft an override file with a different hostname if you just want to
+use something other than `localhost`, of course; you don't have to be using WSL
+to take advantage of this.
 
 
 [hosts file]: https://www.freecodecamp.org/news/how-to-find-and-edit-a-windows-hosts-file/
