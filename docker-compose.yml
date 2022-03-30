@@ -4,17 +4,11 @@ services:
   nginx:
     depends_on:
       - traefik
-    expose:
-      - 80
     image: nginx:latest
-    networks:
-      - proxy
-      - internal
     restart: unless-stopped
     volumes:
       - ./html:/usr/share/nginx/html:ro
     labels:
-      - traefik.docker.network=proxy
       - traefik.http.routers.avatars.entrypoints=websecure
       - traefik.http.routers.avatars.rule=Host(`localhost`)
       - traefik.http.routers.avatars.service=avatars
@@ -23,8 +17,6 @@ services:
 
   traefik:
     image: traefik:2.6.1
-    networks:
-      - proxy
     ports:
       - 80:80
       - 443:443
@@ -33,7 +25,3 @@ services:
       - ./traefik.yml:/traefik.yml:ro
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-
-networks:
-  internal:
-  proxy:
