@@ -62,7 +62,6 @@ if (hs.hasOwnProperty('oauth')) {
 
 		switch (command) {
 			case 'avatar':
-				console.log('Changing');
 				emitter.emit('change', tags['display-name'], args);
 				break;
 		}
