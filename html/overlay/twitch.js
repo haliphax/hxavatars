@@ -10,9 +10,9 @@ const twitch = new tmi.Client({
 });
 
 /** based on tags, is this user the broadcaster? */
-const isBroadcaster = (tags) => tags.badges.hasOwnProperty('broadcaster');
+const isBroadcaster = tags => tags.badges.hasOwnProperty('broadcaster');
 /** based on tags, is this user a moderator? */
-const isModerator = (tags) => tags.mod;
+const isModerator = tags => tags.mod;
 
 export {
 	isBroadcaster,
