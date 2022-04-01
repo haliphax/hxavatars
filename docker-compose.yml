@@ -16,7 +16,7 @@ services:
       - traefik.http.services.avatars.loadbalancer.server.port=80
 
   traefik:
-    image: traefik:2.6.1
+    image: traefik:2.6
     ports:
       - 80:80
       - 443:443
