@@ -1,9 +1,10 @@
 import constants from '../constants.js';
 import emitter from './emitter.js';
 import { hs } from '../util.js';
+import { twitchClient } from './twitch.js';
+// scenes
 import DirectorScene from './scenes/director.js';
 import MainScene from './scenes/main.js';
-import { twitch } from './twitch.js';
 
 if (!hs.hasOwnProperty('oauth') && !hs.hasOwnProperty('demo'))
 	window.location = constants.OAUTH_URL;
@@ -33,6 +34,9 @@ const game = new Phaser.Game(options);
 
 /** which chatters already have avatars */
 const avatars = {};
+
+/** late-bound Twitch connection */
+const twitch = twitchClient();
 
 if (hs.hasOwnProperty('oauth')) {
 	/** regex for parsing commands from chat messages */

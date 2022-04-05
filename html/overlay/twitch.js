@@ -1,7 +1,7 @@
 import { hs } from '../util.js';
 
 /** Twitch client */
-const twitch = new tmi.Client({
+const twitchClient = () => new tmi.Client({
 	channels: [hs.channel],
 	identity: {
 		username: hs.username,
@@ -17,5 +17,5 @@ const isModerator = tags => tags.mod;
 export {
 	isBroadcaster,
 	isModerator,
-	twitch,
+	twitchClient,
 };
