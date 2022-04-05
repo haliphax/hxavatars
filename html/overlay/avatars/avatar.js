@@ -130,16 +130,12 @@ class Avatar extends Phaser.Physics.Arcade.Sprite {
 		this.label.avatar = this;
 		this.label.container = this.container;
 		this.label.overlapping = false;
-		this.scene.physics.world.enableBody(this.label);
 		this.container.avatar = this;
-		this.scene.physics.world.enableBody(this.container);
 		this.stateService.onTransition(state => {
 			this.previousState = this.currentState.name;
 			this.currentState = state;
 		});
-		this.stateService.start();
-		this.stateService.send('idle');
-		this.ready();
+		this.physicsReady();
 		// needs this for it to be a "real" sprite
 		scene.add.existing(this);
 	}
@@ -151,7 +147,17 @@ class Avatar extends Phaser.Physics.Arcade.Sprite {
 		this.stateService.stop();
 	}
 
-	/** called from constructor to await physics */
+	/** called from constructor to activate physics */
+	physicsReady() {
+		if (!this.scene.physics.world)
+			return setTimeout(this.physicsReady.bind(this), 100);
+
+		this.scene.physics.world.enableBody(this.label);
+		this.scene.physics.world.enableBody(this.container);
+		this.ready();
+	}
+
+	/** called from physicsReady to await physics */
 	ready() {
 		if (!this.container.body || !this.label.body)
 			return setTimeout(this.ready.bind(this), 100);
@@ -165,11 +171,13 @@ class Avatar extends Phaser.Physics.Arcade.Sprite {
 		this.container.setPosition(
 			Math.random() * (constants.SCREEN_WIDTH - this.displayWidth),
 			constants.SCREEN_HEIGHT);
+		this.stateService.start();
+		this.stateService.send('idle');
 	}
 
 	/** update the avatar per animation frame */
 	update() {
-		if (!this.container.body || !this.label.body)
+		if (!this.scene.spriteGroup || !this.container.body || !this.label.body)
 			return;
 
 		// raise/lower labels to avoid overlap

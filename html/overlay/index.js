@@ -1,14 +1,22 @@
+/***
+ * TODO:
+ *
+ * - define and load avatars into dummy (invisible) scene
+ * - use scene.physics.add.existing to add avatar sprites to "real" scenes
+ * - one event to instantiate the avatar
+ * - avatar instantiation causes secondary event that adds sprite to scene(s)
+ */
 import constants from '../constants.js';
 import emitter from './emitter.js';
 import { hs } from '../util.js';
+import DirectorScene from './scenes/director.js';
 import MainScene from './scenes/main.js';
 import { twitch } from './twitch.js';
 
 if (!hs.hasOwnProperty('oauth') && !hs.hasOwnProperty('demo'))
 	window.location = constants.OAUTH_URL;
 
-/** main Phaser.Game instance */
-const game = new Phaser.Game({
+const options = {
 	height: constants.SCREEN_HEIGHT,
 	physics: {
 		default: 'arcade',
@@ -23,10 +31,13 @@ const game = new Phaser.Game({
 	render: {
 		transparent: (hs.hasOwnProperty('demo') ? false : true),
 	},
-	scene: [MainScene],
+	scene: [DirectorScene, MainScene],
 	type: Phaser.AUTO,
 	width: constants.SCREEN_WIDTH,
-});
+};
+
+/** Phaser game instance */
+const game = new Phaser.Game(options);
 
 /** which chatters already have avatars */
 const avatars = {};
@@ -43,7 +54,7 @@ if (hs.hasOwnProperty('oauth')) {
 		if (!avatars.hasOwnProperty(tags['display-name'])) {
 			avatars[tags['display-name']] = true;
 			// TODO: remember selection from before
-			emitter.emit('new', tags['display-name']);
+			emitter.emit('new-avatar', tags['display-name']);
 		}
 
 		const cmd = commandRgx.exec(message);
@@ -62,7 +73,7 @@ if (hs.hasOwnProperty('oauth')) {
 
 		switch (command) {
 			case 'avatar':
-				emitter.emit('change', tags['display-name'], args);
+				emitter.emit('change-avatar', tags['display-name'], args);
 				break;
 		}
 	});
@@ -87,7 +98,7 @@ if (hs.hasOwnProperty('demo')) {
 				if (i % 100 === 0)
 					console.log(`Avatar #${i}`);
 
-				emitter.emit('new', `Avatar#${i}`);
+				emitter.emit('new-avatar', `Avatar#${i}`);
 			}
 		},
 		1000);
