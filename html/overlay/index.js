@@ -85,8 +85,11 @@ if (hs.hasOwnProperty('demo')) {
 
 	setTimeout(() =>
 		{
-			for (let i = 1; i <= howMany; i++) {
-				emitter.emit('new-avatar', `Avatar#${i}`);
+			const values = crypto.getRandomValues(new Uint16Array(howMany))
+				.map(v => v % (8 * howMany));
+
+			for (let i = 0; i < howMany; i++) {
+				emitter.emit('new-avatar', `Avatar#${i + 1}`, null, -values[i]);
 			}
 		},
 		1000);

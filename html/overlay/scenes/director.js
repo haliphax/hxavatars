@@ -118,7 +118,7 @@ class DirectorScene extends Phaser.Scene {
 	}
 
 	/** new avatar event */
-	onNewAvatar(username, key = null) {
+	onNewAvatar(username, key = null, labelY = null) {
 		if (this.avatars.hasOwnProperty(username))
 			return;
 
@@ -127,9 +127,14 @@ class DirectorScene extends Phaser.Scene {
 		else if (!avatarKeys.includes(key))
 			return;
 
-		this.avatars[username] = new avatarDefs[key].class(
+		const avatar = new avatarDefs[key].class(
 			this.game.scene.keys[this.currentScene], avatarDefs, username, key);
 
+		if (labelY !== null) {
+			avatar.label.y = labelY;
+		}
+
+		this.avatars[username] = avatar;
 		// add new avatar to scenes
 		emitter.emit('register-avatar', this.avatars[username]);
 	}
