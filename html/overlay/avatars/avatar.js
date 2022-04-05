@@ -142,7 +142,7 @@ class Avatar extends Phaser.Physics.Arcade.Sprite {
 
 	/** clean up avatar */
 	destroy() {
-		this.destroy();
+		super.destroy();
 		this.label.destroy();
 		this.stateService.stop();
 	}
