@@ -120,7 +120,7 @@ class MainScene extends Phaser.Scene {
 
 		this.avatars[username] =
 			new avatarDefs[key].class(this, avatarDefs, username, key);
-		this.spriteGroup.add(this.avatars[username].sprite);
+		this.spriteGroup.add(this.avatars[username]);
 		this.labelGroup.add(this.avatars[username].label);
 	}
 

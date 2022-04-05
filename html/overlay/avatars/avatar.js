@@ -4,10 +4,13 @@ import constants from '../../constants.js';
 import { uuid } from '../../util.js';
 
 /** on-screen avatar with state machine */
-class Avatar {
+class Avatar extends Phaser.Physics.Arcade.Sprite {
 	constructor(scene, avatarDefs, username, key, x) {
-		/** @type {Phaser.Scene} The current scene */
-		this.scene = scene;
+		super(scene, x, 0, key);
+		this
+			.setOrigin(0.5, 1)
+			.setScale(avatarDefs[key].metadata.scale);
+
 		/** @type {string} The avatar owner's username */
 		this.username = username;
 		/** @type {string} The avatar's sprite name */
@@ -16,17 +19,13 @@ class Avatar {
 		this.face = Math.random() < constants.CHANCE_TO_CHANGE
 			? constants.FACE_LEFT
 			: constants.FACE_RIGHT;
-		/** @type {Phaser.GameObjects.Sprite} The avatar's sprite */
-		this.sprite = this.scene.physics.add.sprite(x, 0, key)
-			.setOrigin(0.5, 1)
-			.setScale(avatarDefs[key].metadata.scale);
 		/**
 		 * @type {number}
 		 * Half the width of the avatar's sprite; used in calculations */
-		this.halfWidth = this.sprite.displayWidth / 2;
+		this.halfWidth = this.displayWidth / 2;
 		/** @type {number} The original label Y position */
 		this.labelYPosition =
-			-this.sprite.displayHeight - (constants.LABEL_SIZE / 2);
+			-this.displayHeight - (constants.LABEL_SIZE / 2);
 		/** @type {Phase.GameObjects.Label} The username label for the avatar */
 		this.label =
 			this.scene.add.text(
@@ -91,7 +90,7 @@ class Avatar {
 					idle: (context, event) => {
 						//console.debug('idling');
 						this.container.body.setVelocityX(0);
-						this.sprite.play(`${this.key}.idle.${this.face}`);
+						this.play(`${this.key}.idle.${this.face}`);
 						setTimeout(
 							this.stateService.send.bind(this, 'DECIDE'),
 							Math.random() * constants.TIMEOUT_MAX);
@@ -114,7 +113,7 @@ class Avatar {
 									* (constants.WALK_MAX_VELOCITY
 										- constants.WALK_MIN_VELOCITY))
 								* (this.face == constants.FACE_LEFT ? -1 : 1));
-							this.sprite.play(`${this.key}.walking.${this.face}`);
+							this.play(`${this.key}.walking.${this.face}`);
 						}
 
 						setTimeout(
@@ -141,11 +140,13 @@ class Avatar {
 		this.stateService.start();
 		this.stateService.send('idle');
 		this.ready();
+		// needs this for it to be a "real" sprite
+		scene.add.existing(this);
 	}
 
 	/** clean up avatar */
 	destroy() {
-		this.sprite.destroy();
+		this.destroy();
 		this.label.destroy();
 		this.stateService.stop();
 	}
@@ -156,19 +157,19 @@ class Avatar {
 			return setTimeout(this.ready.bind(this), 100);
 
 		this.container.body.setSize(
-			this.sprite.displayWidth, this.sprite.displayHeight, true);
+			this.displayWidth, this.displayHeight, true);
 		this.container.setSize(
-			this.sprite.displayWidth, this.sprite.displayHeight, true);
-		this.container.add(this.sprite);
+			this.displayWidth, this.displayHeight, true);
+		this.container.add(this);
 		this.container.add(this.label);
 		this.container.setPosition(
-			Math.random() * (constants.SCREEN_WIDTH - this.sprite.displayWidth),
+			Math.random() * (constants.SCREEN_WIDTH - this.displayWidth),
 			constants.SCREEN_HEIGHT);
 	}
 
 	/** update the avatar per animation frame */
 	update() {
-		if (!this.container.body || !this.label.body || !this.sprite)
+		if (!this.container.body || !this.label.body)
 			return;
 
 		// raise/lower labels to avoid overlap
@@ -208,11 +209,11 @@ class Avatar {
 				(this.container.body.x <= 0
 					&& this.container.body.velocity.x < 0)
 				|| (this.container.body.x >=
-					constants.SCREEN_WIDTH - this.sprite.displayWidth
+					constants.SCREEN_WIDTH - this.displayWidth
 					&& this.container.body.velocity.x > 0)))
 		{
 			this.changeFace();
-			this.sprite.play(`${this.key}.walking.${this.face}`);
+			this.play(`${this.key}.walking.${this.face}`);
 			this.container.body.setVelocityX(-this.container.body.velocity.x);
 		}
 	}
