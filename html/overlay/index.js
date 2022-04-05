@@ -1,10 +1,8 @@
 import constants from '../constants.js';
+import DirectorScene from './scenes/director.js';
 import emitter from './emitter.js';
 import { hs } from '../util.js';
 import { twitchClient } from './twitch.js';
-// scenes
-import DirectorScene from './scenes/director.js';
-import MainScene from './scenes/main.js';
 
 if (!hs.hasOwnProperty('oauth') && !hs.hasOwnProperty('demo'))
 	window.location = constants.OAUTH_URL;
@@ -24,7 +22,7 @@ const options = {
 	render: {
 		transparent: (hs.hasOwnProperty('demo') ? false : true),
 	},
-	scene: [DirectorScene, MainScene],
+	scene: DirectorScene,
 	type: Phaser.AUTO,
 	width: constants.SCREEN_WIDTH,
 };
@@ -62,9 +60,6 @@ if (hs.hasOwnProperty('oauth')) {
 		/** string of command arguments (if any) */
 		const args = cmd[2];
 
-		console.log(`Command: ${command}`);
-		console.log(`Args: ${args}`);
-
 		// TODO: command timeouts
 
 		switch (command) {
@@ -91,9 +86,6 @@ if (hs.hasOwnProperty('demo')) {
 	setTimeout(() =>
 		{
 			for (let i = 1; i <= howMany; i++) {
-				if (i % 100 === 0)
-					console.log(`Avatar #${i}`);
-
 				emitter.emit('new-avatar', `Avatar#${i}`);
 			}
 		},

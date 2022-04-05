@@ -1,6 +1,8 @@
 import constants from '../../constants.js';
 import emitter from '../emitter.js';
 import WebFontFile from '../webfontfile.js';
+// scenes
+import MainScene from './main.js';
 
 const avatarDefs = {};
 const avatarKeys = [];
@@ -57,8 +59,6 @@ class DirectorScene extends Phaser.Scene {
 	}
 
 	ready() {
-		console.log('ready');
-
 		for (let avatar of avatarKeys) {
 			//console.debug(`initializing ${avatar}`);
 
@@ -84,6 +84,9 @@ class DirectorScene extends Phaser.Scene {
 			}
 		}
 
+		// add child scenes
+		this.scene.add('main', MainScene, true);
+
 		this.scene.start(this.currentScene);
 	}
 
@@ -92,8 +95,6 @@ class DirectorScene extends Phaser.Scene {
 	/** change avatar event */
 	onChangeAvatar(username, key) {
 		if (!avatarKeys.includes(key)) {
-			console.log(avatarKeys);
-			console.log(`No such key: ${key}`);
 			return;
 		}
 
