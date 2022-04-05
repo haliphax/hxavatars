@@ -129,6 +129,7 @@ class DirectorScene extends Phaser.Scene {
 		this.avatars[username] = new avatarDefs[key].class(
 			this.game.scene.keys[this.currentScene], avatarDefs, username, key);
 
+		// add new avatar to scenes
 		emitter.emit('register-avatar', this.avatars[username]);
 	}
 }

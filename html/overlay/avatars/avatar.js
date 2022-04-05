@@ -1,7 +1,4 @@
-import { createMachine, interpret }
-	from 'https://unpkg.com/xstate@4/dist/xstate.web.js';
 import constants from '../../constants.js';
-import { uuid } from '../../util.js';
 
 /** on-screen avatar with state machine */
 class Avatar extends Phaser.Physics.Arcade.Sprite {
@@ -39,112 +36,32 @@ class Avatar extends Phaser.Physics.Arcade.Sprite {
 			.setOrigin(0.5, 1);
 		/** The avatar's container, allowing us to manipulate a single object */
 		this.container = this.scene.add.container();
-		/** The name of the next state to transition to */
-		this.nextState = null;
-		/** The state machine's currently active state */
-		this.currentState = createMachine(
-			{
-				id: uuid(),
-				initial: 'idling',
-				states: {
-					deciding: {
-						entry: ['decide'],
-						on: {
-							DECIDED: [
-								{ target: 'walking', cond: (_, evt) => evt.next == 'walking' },
-								{ target: 'idling', cond: (_, evt) => evt.next == 'idling' },
-							],
-						},
-					},
-					idling: {
-						entry: ['idle'],
-						on: { DECIDE: ['deciding'], },
-					},
-					walking: {
-						entry: ['walk'],
-						on: { DECIDE: ['deciding'], },
-					},
-				},
-			},
-			{
-				actions: {
-					decide: (context, event) => {
-						const rand = Math.random();
-						let next = null;
-
-						if (rand < constants.CHANCE_TO_WALK) {
-							//console.debug('decided to walk');
-							next = 'walking';
-						}
-						else {
-							//console.debug('decided to idle');
-							next = 'idling';
-						}
-
-						this.stateService.send({
-							type: 'DECIDED',
-							next: next,
-							prev: this.currentState.value,
-						});
-					},
-					idle: (context, event) => {
-						//console.debug('idling');
-						this.container.body.setVelocityX(0);
-						this.play(`${this.key}.idle.${this.face}`);
-						setTimeout(
-							this.stateService.send.bind(this, 'DECIDE'),
-							Math.random() * constants.TIMEOUT_MAX);
-					},
-					walk: (context, event) => {
-						//console.debug('walking');
-
-						let swap = Math.random() < (
-							event.prev == 'walking'
-								? constants.CHANCE_TO_CHANGE_IF_WALKING
-								: constants.CHANCE_TO_CHANGE);
-
-						if (swap)
-							this.changeFace();
-
-						if (swap || event.prev != 'walking') {
-							this.container.body.setVelocityX(
-								(constants.WALK_MIN_VELOCITY
-									+ Math.random()
-									* (constants.WALK_MAX_VELOCITY
-										- constants.WALK_MIN_VELOCITY))
-								* (this.face == constants.FACE_LEFT ? -1 : 1));
-							this.play(`${this.key}.walking.${this.face}`);
-						}
-
-						setTimeout(
-							this.stateService.send.bind(this, 'DECIDE'),
-							Math.random() * constants.TIMEOUT_MAX);
-					},
-				}
-			},
-		);
-		/** The service used for communicating with this avatar's state machine */
-		this.stateService = interpret(this.currentState);
 
 		// startup
 		this.label.avatar = this;
 		this.label.container = this.container;
 		this.label.overlapping = false;
 		this.container.avatar = this;
-		this.stateService.onTransition(state => {
-			this.previousState = this.currentState.name;
-			this.currentState = state;
-		});
 		this.physicsReady();
 		// needs this for it to be a "real" sprite
 		scene.add.existing(this);
 	}
 
-	/** clean up avatar */
+	/** destroy avatar; stop state machine */
 	destroy() {
-		super.destroy();
+		if (this.stateMachine)
+			this.stateMachine.stateService.stop();
+
+		this.cleanup();
+	}
+
+	/** called from destroy; actually destroy avatar once stopped */
+	cleanup() {
+		if (this.stateMachine.stateService.status !== 2)
+			setTimeout(this.cleanup.bind(this), 100);
+
 		this.label.destroy();
-		this.stateService.stop();
+		super.destroy();
 	}
 
 	/** called from constructor to activate physics */
@@ -171,8 +88,6 @@ class Avatar extends Phaser.Physics.Arcade.Sprite {
 		this.container.setPosition(
 			Math.random() * (constants.SCREEN_WIDTH - this.displayWidth),
 			constants.SCREEN_HEIGHT);
-		this.stateService.start();
-		this.stateService.send('idle');
 	}
 
 	/** update the avatar per animation frame */
@@ -210,20 +125,6 @@ class Avatar extends Phaser.Physics.Arcade.Sprite {
 
 		if (this.label.y > this.labelYPosition)
 			this.label.setPosition(this.label.x, this.labelYPosition);
-
-		// turn around if avatar hits the edge of the screen
-		if (this.currentState.value == 'walking'
-			&& (
-				(this.container.body.x <= 0
-					&& this.container.body.velocity.x < 0)
-				|| (this.container.body.x >=
-					constants.SCREEN_WIDTH - this.displayWidth
-					&& this.container.body.velocity.x > 0)))
-		{
-			this.changeFace();
-			this.play(`${this.key}.walking.${this.face}`);
-			this.container.body.setVelocityX(-this.container.body.velocity.x);
-		}
 	}
 
 	// extensions

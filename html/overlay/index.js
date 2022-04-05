@@ -1,11 +1,3 @@
-/***
- * TODO:
- *
- * - define and load avatars into dummy (invisible) scene
- * - use scene.physics.add.existing to add avatar sprites to "real" scenes
- * - one event to instantiate the avatar
- * - avatar instantiation causes secondary event that adds sprite to scene(s)
- */
 import constants from '../constants.js';
 import emitter from './emitter.js';
 import { hs } from '../util.js';
