@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: prettier
+        name: prettier
+        args: [prettier, -l, -u, -w]
+        entry: npx
+        language: system
+        types: [text]

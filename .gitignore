@@ -1,2 +1,4 @@
-docker-compose.override.yml
-html/overlay/tmi.min.js
+/docker-compose.override.yml
+/html/overlay/tmi.min.js
+node_modules/
+
