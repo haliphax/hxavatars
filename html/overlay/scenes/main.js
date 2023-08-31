@@ -1,20 +1,22 @@
-import constants from '../../constants.js';
-import { createMachine, interpret }
-	from 'https://unpkg.com/xstate@4/dist/xstate.web.js';
-import emitter from '../emitter.js';
-import { uuid } from '../../util.js';
+import constants from "../../constants.js";
+import {
+	createMachine,
+	interpret,
+} from "https://unpkg.com/xstate@4/dist/xstate.web.js";
+import emitter from "../emitter.js";
+import { uuid } from "../../util.js";
 
 /** main game scene */
 class MainScene extends Phaser.Scene {
 	constructor() {
-		super('main');
+		super("main");
 	}
 
 	create() {
 		// events
-		this.events.on('pause', this.onPauseScene.bind(this));
-		this.events.on('resume', this.onResumeScene.bind(this));
-		emitter.on('register-avatar', this.onRegisterAvatar.bind(this));
+		this.events.on("pause", this.onPauseScene.bind(this));
+		this.events.on("resume", this.onResumeScene.bind(this));
+		emitter.on("register-avatar", this.onRegisterAvatar.bind(this));
 
 		this.spriteGroup = this.physics.add.group({
 			bounceX: 1,
@@ -30,14 +32,14 @@ class MainScene extends Phaser.Scene {
 	update(time, delta) {
 		for (let avatar of this.spriteGroup.children.entries) {
 			// turn around if avatar hits the edge of the screen
-			if (avatar.stateMachine.currentState.value == 'walking'
-				&& (
-					(avatar.container.body.x <= 0
-						&& avatar.container.body.velocity.x < 0)
-					|| (avatar.container.body.x >=
-						constants.SCREEN_WIDTH - avatar.displayWidth
-						&& avatar.container.body.velocity.x > 0)))
-			{
+			if (
+				avatar.stateMachine.currentState.value == "walking" &&
+				((avatar.container.body.x <= 0 &&
+					avatar.container.body.velocity.x < 0) ||
+					(avatar.container.body.x >=
+						constants.SCREEN_WIDTH - avatar.displayWidth &&
+						avatar.container.body.velocity.x > 0))
+			) {
 				avatar.changeFace();
 				avatar.play(`${avatar.key}.walking.${avatar.face}`);
 				avatar.container.body.setVelocityX(-avatar.container.body.velocity.x);
@@ -78,24 +80,27 @@ class MainScene extends Phaser.Scene {
 			currentState: createMachine(
 				{
 					id: uuid(),
-					initial: 'idling',
+					initial: "idling",
 					states: {
 						deciding: {
-							entry: ['decide'],
+							entry: ["decide"],
 							on: {
 								DECIDED: [
-									{ target: 'walking', cond: (_, evt) => evt.next == 'walking' },
-									{ target: 'idling', cond: (_, evt) => evt.next == 'idling' },
+									{
+										target: "walking",
+										cond: (_, evt) => evt.next == "walking",
+									},
+									{ target: "idling", cond: (_, evt) => evt.next == "idling" },
 								],
 							},
 						},
 						idling: {
-							entry: ['idle'],
-							on: { DECIDE: ['deciding'], },
+							entry: ["idle"],
+							on: { DECIDE: ["deciding"] },
 						},
 						walking: {
-							entry: ['walk'],
-							on: { DECIDE: ['deciding'], },
+							entry: ["walk"],
+							on: { DECIDE: ["deciding"] },
 						},
 					},
 				},
@@ -107,15 +112,14 @@ class MainScene extends Phaser.Scene {
 
 							if (rand < constants.CHANCE_TO_WALK) {
 								//console.debug('decided to walk');
-								next = 'walking';
-							}
-							else {
+								next = "walking";
+							} else {
 								//console.debug('decided to idle');
-								next = 'idling';
+								next = "idling";
 							}
 
 							avatar.stateMachine.stateService.send({
-								type: 'DECIDED',
+								type: "DECIDED",
 								next: next,
 								prev: avatar.stateMachine.currentState.value,
 							});
@@ -125,48 +129,52 @@ class MainScene extends Phaser.Scene {
 							avatar.container.body.setVelocityX(0);
 							avatar.play(`${avatar.key}.idle.${avatar.face}`);
 							setTimeout(
-								avatar.stateMachine.stateService.send.bind(this, 'DECIDE'),
-								Math.random() * constants.TIMEOUT_MAX);
+								avatar.stateMachine.stateService.send.bind(this, "DECIDE"),
+								Math.random() * constants.TIMEOUT_MAX,
+							);
 						},
 						walk: (context, event) => {
 							//console.debug('walking');
 
-							let swap = Math.random() < (
-								event.prev == 'walking'
+							let swap =
+								Math.random() <
+								(event.prev == "walking"
 									? constants.CHANCE_TO_CHANGE_IF_WALKING
 									: constants.CHANCE_TO_CHANGE);
 
-							if (swap)
-								avatar.changeFace();
+							if (swap) avatar.changeFace();
 
-							if (swap || event.prev != 'walking') {
+							if (swap || event.prev != "walking") {
 								avatar.container.body.setVelocityX(
-									(constants.WALK_MIN_VELOCITY
-										+ Math.random()
-										* (constants.WALK_MAX_VELOCITY
-											- constants.WALK_MIN_VELOCITY))
-									* (avatar.face == constants.FACE_LEFT ? -1 : 1));
+									(constants.WALK_MIN_VELOCITY +
+										Math.random() *
+											(constants.WALK_MAX_VELOCITY -
+												constants.WALK_MIN_VELOCITY)) *
+										(avatar.face == constants.FACE_LEFT ? -1 : 1),
+								);
 								avatar.play(`${avatar.key}.walking.${avatar.face}`);
 							}
 
 							setTimeout(
-								avatar.stateMachine.stateService.send.bind(this, 'DECIDE'),
-								Math.random() * constants.TIMEOUT_MAX);
+								avatar.stateMachine.stateService.send.bind(this, "DECIDE"),
+								Math.random() * constants.TIMEOUT_MAX,
+							);
 						},
 					},
-				}),
-			};
+				},
+			),
+		};
 
 		/** The service used for communicating with this avatar's state machine */
-		avatar.stateMachine.stateService =
-			interpret(avatar.stateMachine.currentState);
-		avatar.stateMachine.stateService.onTransition(state => {
-			avatar.stateMachine.previousState =
-				avatar.stateMachine.currentState.name;
+		avatar.stateMachine.stateService = interpret(
+			avatar.stateMachine.currentState,
+		);
+		avatar.stateMachine.stateService.onTransition((state) => {
+			avatar.stateMachine.previousState = avatar.stateMachine.currentState.name;
 			avatar.stateMachine.currentState = state;
 		});
 		avatar.stateMachine.stateService.start();
-		avatar.stateMachine.stateService.send('idle');
+		avatar.stateMachine.stateService.send("idle");
 	}
 }
 

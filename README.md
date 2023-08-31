@@ -16,8 +16,8 @@ viewed in full-screen._
 The following commands are available from the overlay's chat integration, with
 more to come:
 
-| Command | Description |
-|---|---|
+| Command           | Description                                  |
+| ----------------- | -------------------------------------------- |
 | `!avatar <value>` | Sets the user's avatar (if the value exists) |
 
 # 🏠 Running it yourself
@@ -51,7 +51,6 @@ docker-compose up
 You may craft an override file with a different hostname if you just want to
 use something other than `localhost`, of course; you don't have to be using WSL
 to take advantage of this.
-
 
 [hosts file]: https://www.freecodecamp.org/news/how-to-find-and-edit-a-windows-hosts-file/
 [nginx]: https://nginx.org

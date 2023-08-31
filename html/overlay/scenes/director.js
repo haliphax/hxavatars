@@ -1,40 +1,42 @@
-import constants from '../../constants.js';
-import emitter from '../emitter.js';
-import WebFontFile from '../webfontfile.js';
+import constants from "../../constants.js";
+import emitter from "../emitter.js";
+import WebFontFile from "../webfontfile.js";
 // scenes
-import MainScene from './main.js';
+import MainScene from "./main.js";
 
 const avatarDefs = {};
 const avatarKeys = [];
 
 // fetch is relative to document
-await fetch('./config.json').then(r => r.json()).then(async d => {
-	for (let avatar of d.avatars) {
-		//console.debug(`importing ${avatar}`);
+await fetch("./config.json")
+	.then((r) => r.json())
+	.then(async (d) => {
+		for (let avatar of d.avatars) {
+			//console.debug(`importing ${avatar}`);
 
-		// import is relative to script
-		await import(`../avatars/${avatar}/avatar.js`).then(m => {
-			//console.debug(`defining ${avatar}`);
-			avatarDefs[avatar] = {
-				metadata: m.metadata,
-				class: m.ExtendedAvatar,
-			};
-		});
-	}
+			// import is relative to script
+			await import(`../avatars/${avatar}/avatar.js`).then((m) => {
+				//console.debug(`defining ${avatar}`);
+				avatarDefs[avatar] = {
+					metadata: m.metadata,
+					class: m.ExtendedAvatar,
+				};
+			});
+		}
 
-	Object.keys(avatarDefs).map(k => avatarKeys.push(k));
-});
+		Object.keys(avatarDefs).map((k) => avatarKeys.push(k));
+	});
 
 class DirectorScene extends Phaser.Scene {
 	constructor() {
-		super('director');
+		super("director");
 
-		this.currentScene = 'main';
+		this.currentScene = "main";
 		this.avatars = {};
 
 		// event handlers
-		emitter.on('change-avatar', this.onChangeAvatar.bind(this));
-		emitter.on('new-avatar', this.onNewAvatar.bind(this));
+		emitter.on("change-avatar", this.onChangeAvatar.bind(this));
+		emitter.on("new-avatar", this.onNewAvatar.bind(this));
 	}
 
 	preload() {
@@ -42,10 +44,12 @@ class DirectorScene extends Phaser.Scene {
 
 		for (let avatar of avatarKeys) {
 			const def = avatarDefs[avatar];
-			const extras = (def.metadata.hasOwnProperty('extruded')
-				&& def.metadata.extruded)
+			const extras =
+				def.metadata.hasOwnProperty("extruded") && def.metadata.extruded
 					? { margin: 1, spacing: 2 }
-					: { /* empty */ };
+					: {
+							/* empty */
+					  };
 
 			// load is relative to document
 			this.load.spritesheet(avatar, `./avatars/${avatar}/avatar.png`, {
@@ -55,7 +59,7 @@ class DirectorScene extends Phaser.Scene {
 			});
 		}
 
-		this.load.on('complete', this.ready.bind(this));
+		this.load.on("complete", this.ready.bind(this));
 	}
 
 	ready() {
@@ -67,16 +71,17 @@ class DirectorScene extends Phaser.Scene {
 			for (let animKey of Object.keys(def.metadata.animations)) {
 				const anim = def.metadata.animations[animKey];
 
-				for (let variation of
-					Object.keys(anim).filter(v => v != 'frameRate'))
-				{
+				for (let variation of Object.keys(anim).filter(
+					(v) => v != "frameRate",
+				)) {
 					const key = `${avatar}.${animKey}.${variation}`;
 
 					//console.debug(`creating ${key}`);
 					this.anims.create({
 						key: key,
-						frames: this.anims.generateFrameNumbers(
-							avatar, { frames: anim[variation] }),
+						frames: this.anims.generateFrameNumbers(avatar, {
+							frames: anim[variation],
+						}),
 						frameRate: anim.frameRate,
 						repeat: -1,
 					});
@@ -85,7 +90,7 @@ class DirectorScene extends Phaser.Scene {
 		}
 
 		// add child scenes
-		this.scene.add('main', MainScene, true);
+		this.scene.add("main", MainScene, true);
 
 		this.scene.start(this.currentScene);
 	}
@@ -111,24 +116,25 @@ class DirectorScene extends Phaser.Scene {
 
 			newAvatar.container.x = containerX;
 			newAvatar.label.y = labelY;
-		}
-		else {
+		} else {
 			this.onNewAvatar(username, key);
 		}
 	}
 
 	/** new avatar event */
 	onNewAvatar(username, key = null, labelY = null) {
-		if (this.avatars.hasOwnProperty(username))
-			return;
+		if (this.avatars.hasOwnProperty(username)) return;
 
 		if (key === null || key == undefined)
 			key = avatarKeys[Math.floor(Math.random() * avatarKeys.length)];
-		else if (!avatarKeys.includes(key))
-			return;
+		else if (!avatarKeys.includes(key)) return;
 
 		const avatar = new avatarDefs[key].class(
-			this.game.scene.keys[this.currentScene], avatarDefs, username, key);
+			this.game.scene.keys[this.currentScene],
+			avatarDefs,
+			username,
+			key,
+		);
 
 		if (labelY !== null) {
 			avatar.label.y = labelY;
@@ -136,7 +142,7 @@ class DirectorScene extends Phaser.Scene {
 
 		this.avatars[username] = avatar;
 		// add new avatar to scenes
-		emitter.emit('register-avatar', this.avatars[username]);
+		emitter.emit("register-avatar", this.avatars[username]);
 	}
 }
 

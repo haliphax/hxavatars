@@ -1,26 +1,26 @@
-import constants from '../constants.js';
-import DirectorScene from './scenes/director.js';
-import emitter from './emitter.js';
-import { hs } from '../util.js';
-import { twitchClient } from './twitch.js';
+import constants from "../constants.js";
+import DirectorScene from "./scenes/director.js";
+import emitter from "./emitter.js";
+import { hs } from "../util.js";
+import { twitchClient } from "./twitch.js";
 
-if (!hs.hasOwnProperty('oauth') && !hs.hasOwnProperty('demo'))
+if (!hs.hasOwnProperty("oauth") && !hs.hasOwnProperty("demo"))
 	window.location = constants.OAUTH_URL;
 
 const options = {
 	height: constants.SCREEN_HEIGHT,
 	physics: {
-		default: 'arcade',
+		default: "arcade",
 		arcade: {
 			debug: false,
 			gravity: {
-				y: (hs.gravity || constants.GRAVITY),
+				y: hs.gravity || constants.GRAVITY,
 			},
 		},
 	},
 	pixelArt: true,
 	render: {
-		transparent: (hs.hasOwnProperty('demo') ? false : true),
+		transparent: hs.hasOwnProperty("demo") ? false : true,
 	},
 	scene: DirectorScene,
 	type: Phaser.AUTO,
@@ -36,19 +36,18 @@ const avatars = {};
 /** late-bound Twitch connection */
 const twitch = twitchClient();
 
-if (hs.hasOwnProperty('oauth')) {
+if (hs.hasOwnProperty("oauth")) {
 	/** regex for parsing commands from chat messages */
 	const commandRgx = /^(\![-_.a-z0-9]+)(?:\s+(.+))?$/i;
 
-	twitch.on('message', (channel, tags, message, self) => {
-		if (self)
-			return;
+	twitch.on("message", (channel, tags, message, self) => {
+		if (self) return;
 
 		// add avatar for chatter if they don't have one
-		if (!avatars.hasOwnProperty(tags['display-name'])) {
-			avatars[tags['display-name']] = true;
+		if (!avatars.hasOwnProperty(tags["display-name"])) {
+			avatars[tags["display-name"]] = true;
 			// TODO: remember selection from before
-			emitter.emit('new-avatar', tags['display-name']);
+			emitter.emit("new-avatar", tags["display-name"]);
 		}
 
 		const cmd = commandRgx.exec(message);
@@ -63,8 +62,8 @@ if (hs.hasOwnProperty('oauth')) {
 		// TODO: command timeouts
 
 		switch (command) {
-			case 'avatar':
-				emitter.emit('change-avatar', tags['display-name'], args);
+			case "avatar":
+				emitter.emit("change-avatar", tags["display-name"], args);
 				break;
 		}
 	});
@@ -73,26 +72,24 @@ if (hs.hasOwnProperty('oauth')) {
 }
 
 // Avatars for testing/demonstration
-if (hs.hasOwnProperty('demo')) {
+if (hs.hasOwnProperty("demo")) {
 	let howMany = 20;
 
 	try {
-		howMany = parseInt(hs.demo)
-	}
-	catch {
+		howMany = parseInt(hs.demo);
+	} catch {
 		//
 	}
 
-	setTimeout(() =>
-		{
-			const values = crypto.getRandomValues(new Uint16Array(howMany))
-				.map(v => v % (8 * howMany));
+	setTimeout(() => {
+		const values = crypto
+			.getRandomValues(new Uint16Array(howMany))
+			.map((v) => v % (8 * howMany));
 
-			for (let i = 0; i < howMany; i++) {
-				emitter.emit('new-avatar', `Avatar#${i + 1}`, null, -values[i]);
-			}
-		},
-		1000);
+		for (let i = 0; i < howMany; i++) {
+			emitter.emit("new-avatar", `Avatar#${i + 1}`, null, -values[i]);
+		}
+	}, 1000);
 }
 
 // for debugging
