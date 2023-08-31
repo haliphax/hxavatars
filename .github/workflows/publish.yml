@@ -1,19 +1,36 @@
-name: Publish site
+name: Publish service
 on:
   push:
-    branches: [ master ]
+    branches: [main]
+
   workflow_dispatch:
+
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Publish site
-      run: |
-        wget https://github.com/tmijs/tmi.js/releases/download/v1.8.5/tmi.min.js -O ./html/overlay/tmi.min.js
-        mv ./html ./docs
-        git config user.email git@github.com
-        git config user.name 'GitHub Actions'
-        git add .
-        git commit -m 'Publish site'
-        git push -f -u origin master:gh-pages
+      - uses: actions/checkout@v2
+
+      - name: Build
+        run: |
+          wget https://github.com/tmijs/tmi.js/releases/download/v1.8.5/tmi.min.js -O ./html/tmi.min.js
+
+      - uses: actions/upload-pages-artifact@v2
+        with:
+          path: html/
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v2
