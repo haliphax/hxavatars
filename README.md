@@ -8,9 +8,6 @@ Visit https://haliphax.github.io/hxavatars to either build an overlay URL for
 yourself or to view a demonstration (with no chat integration and a fixed
 background color).
 
-_Note: The overlay is currently hard-coded to 1920x1080, and expects to be
-viewed in full-screen._
-
 # 🎲 Commands
 
 The following commands are available from the overlay's chat integration, with
