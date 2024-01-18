@@ -7,6 +7,8 @@ import { twitchClient } from "./twitch.js";
 if (!hs.hasOwnProperty("oauth") && !hs.hasOwnProperty("demo"))
 	window.location = constants.OAUTH_URL;
 
+if (hs.hasOwnProperty("demo")) document.body.classList.add("demo");
+
 const options = {
 	height: constants.SCREEN_HEIGHT,
 	physics: {
@@ -20,7 +22,7 @@ const options = {
 	},
 	pixelArt: true,
 	render: {
-		transparent: hs.hasOwnProperty("demo") ? false : true,
+		transparent: true,
 	},
 	scene: DirectorScene,
 	type: Phaser.AUTO,

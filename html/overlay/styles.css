@@ -9,6 +9,10 @@ body {
 	width: 100%;
 }
 
+body.demo {
+	background-color: #777;
+}
+
 * {
 	image-rendering: pixelated !important;
 	image-rendering: crisp-edges !important;
