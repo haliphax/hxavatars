@@ -1,6 +1,6 @@
 # 👾 hxAvatars
 
-A front-end-only stream overlay that represents your chat as animated sprites.
+A static site stream overlay that represents your chat as animated sprites.
 
 # 🎥 Using the overlay
 
